@@ -25,6 +25,9 @@ app.use((req, res, next) => {
 });
 app.use(routes);
 
+const helmet = require("helmet");
+app.use(helmet());
+
 process.on("uncaughtException", (err, origin) => {
   console.log(
     `${origin} ${err.name} with the message ${err.message} was not handled. Pay attention to it!`,
