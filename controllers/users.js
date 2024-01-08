@@ -12,7 +12,7 @@ module.exports.getUsers = (req, res) => {
       if (err instanceof Errors.HTTPNotFound) {
         return Errors.notFoundError(res, err);
       }
-      return Errors.defaultError(res, err);
+      return Errors.defaultError(res);
     });
 };
 
@@ -32,7 +32,7 @@ module.exports.getUserById = (req, res) => {
       if (err.name === "CastError") {
         return Errors.invalidIdError(res, "User", userId);
       }
-      return Errors.defaultError(res, err);
+      return Errors.defaultError(res);
     });
 };
 
@@ -44,8 +44,8 @@ module.exports.createUser = (req, res) => {
     .catch((err) => {
       console.error("Error Name = %s Message=%s", err.name, err.message);
       if (err.name === "ValidationError") {
-        return Errors.validateError(res, err);
+        return Errors.validateError(res);
       }
-      return Errors.defaultError(res, err);
+      return Errors.defaultError(res);
     });
 };

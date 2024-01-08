@@ -14,6 +14,7 @@ mongoose.connect(
   },
 );
 
+const helmet = require("helmet");
 const routes = require("./routes");
 
 app.use(express.json());
@@ -23,10 +24,8 @@ app.use((req, res, next) => {
   };
   next();
 });
-app.use(routes);
-
-const helmet = require("helmet");
 app.use(helmet());
+app.use(routes);
 
 process.on("uncaughtException", (err, origin) => {
   console.log(

@@ -13,12 +13,12 @@ class HTTPNotFound extends Error {
   }
 }
 
-const defaultError = (res, err) =>
+const defaultError = (res) =>
   res.status(HTTP_INTERNAL_SERVER_ERROR).send({
     message: `${defaultServerErrorMessage}`,
   });
 
-const validateError = (res, err) =>
+const validateError = (res) =>
   res.status(HTTP_BAD_REQUEST).send({
     message: `${defaultBadRequestMessage}`,
   });

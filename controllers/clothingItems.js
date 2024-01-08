@@ -13,7 +13,7 @@ module.exports.getClothingItems = (req, res) => {
       if (err instanceof Errors.HTTPNotFound) {
         return Errors.notFoundError(res, err);
       }
-      return Errors.defaultError(res, err);
+      return Errors.defaultError(res);
     });
 };
 
@@ -32,9 +32,9 @@ module.exports.createClothingItem = (req, res) => {
     .catch((err) => {
       console.error("Error Name = %s Message=%s", err.name, err.message);
       if (err.name === "ValidationError") {
-        return Errors.validateError(res, err);
+        return Errors.validateError(res);
       }
-      return Errors.defaultError(res, err);
+      return Errors.defaultError(res);
     });
 };
 
@@ -54,7 +54,7 @@ module.exports.deleteClothingItem = (req, res) => {
       if (err.name === "CastError") {
         return Errors.invalidIdError(res, "Item", itemId);
       }
-      return Errors.defaultError(res, err);
+      return Errors.defaultError(res);
     });
 };
 
@@ -75,7 +75,7 @@ module.exports.likeClothingItem = (req, res) => {
       if (err.name === "CastError") {
         return Errors.invalidIdError(res, "Item", itemId);
       }
-      return Errors.defaultError(res, err);
+      return Errors.defaultError(res);
     });
 };
 
@@ -96,6 +96,6 @@ module.exports.dislikeClothingItem = (req, res) => {
       if (err.name === "CastError") {
         return Errors.invalidIdError(res, "Item", itemId);
       }
-      return Errors.defaultError(res, err);
+      return Errors.defaultError(res);
     });
 };
