@@ -38,18 +38,38 @@ module.exports.createClothingItem = (req, res) => {
     });
 };
 
+class HTTPForbidden extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "HTTPForbidden";
+    this.statusCode = Errors.HTTP_FORBIDDEN;
+  }
+}
+
 module.exports.deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
   clothingItem
-    .findByIdAndRemove(itemId)
+    .findById(itemId)
     .orFail(() => {
       throw new Errors.HTTPNotFound(`Item with id ${itemId} not found`);
     })
-    .then((item) => res.send({ data: item }))
+    .then((item) => {
+      if (item.owner.toString() !== req.user._id) {
+        throw new HTTPForbidden(
+          `Deleting an item of another user is not allowed`,
+        );
+      }
+
+      clothingItem.deleteOne({ _id: itemId }).then((deleted) => {
+        res.send({ data: deleted });
+      });
+    })
     .catch((err) => {
-      console.error("Error Name = %s Message=%s", err.name, err.message);
       if (err instanceof Errors.HTTPNotFound) {
         return Errors.notFoundError(res, err);
+      }
+      if (err instanceof HTTPForbidden) {
+        return Errors.forbiddenError(res, err);
       }
       if (err.name === "CastError") {
         return Errors.invalidIdError(res, "Item", itemId);

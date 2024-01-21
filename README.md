@@ -7,9 +7,8 @@ The back-end project is focused on creating a server for the WTWR application.
 Server support requests to 2 collections - "users" and "clothing items".
 For users server supportes requests:
 
-- GET /users — returns all users
-- GET /users/:userId - returns a user by \_id
-- POST /users — creates a new user
+- GET /users/me - get the logged-in user data by \_id
+- PATCH /users/me - modify logged-in the user data (name and avatar fields only)
 
 For "clothing items" collection server supportes requests:
 
@@ -18,6 +17,11 @@ For "clothing items" collection server supportes requests:
 - DELETE /items/:itemId — deletes an item by \_id
 - PUT /items/:itemId/likes — like an item
 - DELETE /items/:itemId/likes — unlike an item
+
+Also there are requests for logging in and registering:
+
+- POST /signin — logging in
+- POST /signup — register new user
 
 ## Technologies and techniques
 
