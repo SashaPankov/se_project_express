@@ -4,27 +4,10 @@ const User = require("../models/user");
 const Errors = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
-module.exports.getUsers = (req, res) => {
-  User.find({})
+module.exports.getUserById = (req, res) => {
+  User.findById(req.user._id)
     .orFail(() => {
-      throw new Errors.HTTPNotFound("No users yet here :(");
-    })
-    .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      console.error("Error Name = %s Message=%s", err.name, err.message);
-      if (err instanceof Errors.HTTPNotFound) {
-        return Errors.notFoundError(res, err);
-      }
-      return Errors.defaultError(res);
-    });
-};
-
-const getUserById = (req, res) => {
-  const { userId } = req.params;
-
-  User.findById(userId)
-    .orFail(() => {
-      throw new Errors.HTTPNotFound(`User with id ${userId} not found`);
+      throw new Errors.HTTPNotFound(`User with id ${req.user._id} not found`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -33,7 +16,7 @@ const getUserById = (req, res) => {
         return Errors.notFoundError(res, err);
       }
       if (err.name === "CastError") {
-        return Errors.invalidIdError(res, "User", userId);
+        return Errors.invalidIdError(res, "User", req.user._id);
       }
       return Errors.defaultError(res);
     });
@@ -42,35 +25,31 @@ const getUserById = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   console.log(req.body);
-  bcrypt.hash(password, 10).then((hash) =>
-    User.create({ name, avatar, email, password: hash })
-      .then((user) =>
+  bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({ name, avatar, email, password: hash }).then((user) =>
         res.send({
           _id: user._id,
           name: user.name,
           avatar: user.avatar,
           email: user.email,
         }),
-      )
-      .catch((err) => {
-        console.error(
-          "Error Name = %s Message=%s Code=%d",
-          err.name,
-          err.message,
-          err.code,
-        );
-        if (err.name === "ValidationError") {
-          return Errors.validateError(res);
-        }
-        if (
-          err.name === "MongoServerError" &&
-          err.code === Errors.MONGODB_DUPLICATE_ERROR
-        ) {
-          return Errors.dbDuplicateEmailError(res, email);
-        }
-        return Errors.defaultError(res);
-      }),
-  );
+      ),
+    )
+    .catch((err) => {
+      console.error("Error Name = %s Message=%s", err.name, err.message);
+      if (err.name === "ValidationError") {
+        return Errors.validateError(res);
+      }
+      if (
+        err.name === "MongoServerError" &&
+        err.code === Errors.MONGODB_DUPLICATE_ERROR
+      ) {
+        return Errors.dbDuplicateEmailError(res, email);
+      }
+      return Errors.defaultError(res);
+    });
 };
 
 module.exports.login = (req, res) => {
@@ -89,14 +68,12 @@ module.exports.login = (req, res) => {
       if (err.name === "HTTPUnauthorized") {
         return Errors.unauthorizedError(res, err);
       }
+      if (err.name === "validateError") {
+        return Errors.validateError(res, err);
+      }
 
-      return Errors.validateError(res);
+      return Errors.defaultError(res);
     });
-};
-
-module.exports.getCurrentUser = (req, res) => {
-  req.params.userId = req.user._id;
-  return getUserById(req, res);
 };
 
 module.exports.updateProfile = (req, res) => {

@@ -1,12 +1,10 @@
 const clothingItem = require("../models/clothingItem");
 const Errors = require("../utils/errors");
+const HTTPForbidden = require("../utils/httpforbidden");
 
 module.exports.getClothingItems = (req, res) => {
   clothingItem
     .find({})
-    .orFail(() => {
-      throw new Errors.HTTPNotFound("No clothing items yet here :(");
-    })
     .then((items) => res.send({ data: items }))
     .catch((err) => {
       console.error("Error Name = %s Message=%s", err.name, err.message);
@@ -37,14 +35,6 @@ module.exports.createClothingItem = (req, res) => {
       return Errors.defaultError(res);
     });
 };
-
-class HTTPForbidden extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "HTTPForbidden";
-    this.statusCode = Errors.HTTP_FORBIDDEN;
-  }
-}
 
 module.exports.deleteClothingItem = (req, res) => {
   const { itemId } = req.params;

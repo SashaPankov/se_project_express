@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
-const { HTTP_UNAUTHORIZED } = require("../utils/errors");
+const HTTPUnauthorized = require("../utils/httpunauthorized");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -35,24 +35,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false,
-    minlength: 8,
   },
 });
-
-class HTTPUnauthorized extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "HTTPUnauthorized";
-    this.statusCode = HTTP_UNAUTHORIZED;
-  }
-}
 
 userSchema.statics.findUserByCredentials = function findUserByCredentials(
   email,
   password,
 ) {
   if (!email || !password) {
-    return Promise.reject(new Error("Password or email not defined"));
+    const errNoLogin = new Error("Password or email not defined");
+    errNoLogin.name = "validateError";
+    return Promise.reject(errNoLogin);
   }
 
   return this.findOne({ email })
