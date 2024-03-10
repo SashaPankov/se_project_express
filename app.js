@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const errorHandler = require("./middlewares/error-handler");
 const { errors } = require("celebrate");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -23,6 +24,7 @@ const routes = require("./routes");
 app.use(cors());
 app.use(express.json());
 app.use(helmet());
+app.use(requestLogger);
 app.use(routes);
 
 process.on("uncaughtException", (err, origin) => {
@@ -31,8 +33,9 @@ process.on("uncaughtException", (err, origin) => {
   );
 });
 
-app.use(errors());
+app.use(errorLogger);
 
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
