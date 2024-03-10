@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const errorHandler = require("./middlewares/error-handler");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -28,6 +29,8 @@ process.on("uncaughtException", (err, origin) => {
     `${origin} ${err.name} with the message ${err.message} was not handled. Pay attention to it!`,
   );
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening at port ${PORT}`);

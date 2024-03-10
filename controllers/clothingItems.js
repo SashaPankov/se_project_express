@@ -1,21 +1,17 @@
 const clothingItem = require("../models/clothingItem");
 const Errors = require("../utils/errors");
 const HTTPForbidden = require("../utils/httpforbidden");
+const HTTPBadRequest = require("../utils/httpbadrequest");
+const HTTPNotFound = require("../utils/httpnotfound");
 
-module.exports.getClothingItems = (req, res) => {
+module.exports.getClothingItems = (req, res, next) => {
   clothingItem
     .find({})
     .then((items) => res.send({ data: items }))
-    .catch((err) => {
-      console.error("Error Name = %s Message=%s", err.name, err.message);
-      if (err instanceof Errors.HTTPNotFound) {
-        return Errors.notFoundError(res, err);
-      }
-      return Errors.defaultError(res);
-    });
+    .catch(next);
 };
 
-module.exports.createClothingItem = (req, res) => {
+module.exports.createClothingItem = (req, res, next) => {
   const ownerId = req.user._id;
   const { name, weather, imageUrl } = req.body;
 
@@ -28,20 +24,20 @@ module.exports.createClothingItem = (req, res) => {
     })
     .then((item) => res.send({ data: item }))
     .catch((err) => {
-      console.error("Error Name = %s Message=%s", err.name, err.message);
       if (err.name === "ValidationError") {
-        return Errors.validateError(res);
+        next(new HTTPBadRequest(Errors.defaultBadRequestMessage));
+      } else {
+        next(err);
       }
-      return Errors.defaultError(res);
     });
 };
 
-module.exports.deleteClothingItem = (req, res) => {
+module.exports.deleteClothingItem = (req, res, next) => {
   const { itemId } = req.params;
   clothingItem
     .findById(itemId)
     .orFail(() => {
-      throw new Errors.HTTPNotFound(`Item with id ${itemId} not found`);
+      throw new HTTPNotFound(`Item with id ${itemId} not found`);
     })
     .then((item) => {
       if (item.owner.toString() !== req.user._id) {
@@ -55,20 +51,15 @@ module.exports.deleteClothingItem = (req, res) => {
       });
     })
     .catch((err) => {
-      if (err instanceof Errors.HTTPNotFound) {
-        return Errors.notFoundError(res, err);
-      }
-      if (err instanceof HTTPForbidden) {
-        return Errors.forbiddenError(res, err);
-      }
       if (err.name === "CastError") {
-        return Errors.invalidIdError(res, "Item", itemId);
+        next(new HTTPBadRequest(`Invalid Item Id: ${itemId}.`));
+      } else {
+        next(err);
       }
-      return Errors.defaultError(res);
     });
 };
 
-module.exports.likeClothingItem = (req, res) => {
+module.exports.likeClothingItem = (req, res, next) => {
   const { itemId } = req.params;
   const ownerId = req.user._id;
   clothingItem
@@ -78,18 +69,15 @@ module.exports.likeClothingItem = (req, res) => {
     })
     .then((item) => res.send({ data: item }))
     .catch((err) => {
-      console.error("Error Name = %s Message=%s", err.name, err.message);
-      if (err instanceof Errors.HTTPNotFound) {
-        return Errors.notFoundError(res, err);
-      }
       if (err.name === "CastError") {
-        return Errors.invalidIdError(res, "Item", itemId);
+        next(new HTTPBadRequest(`Invalid Item Id: ${itemId}.`));
+      } else {
+        next(err);
       }
-      return Errors.defaultError(res);
     });
 };
 
-module.exports.dislikeClothingItem = (req, res) => {
+module.exports.dislikeClothingItem = (req, res, next) => {
   const { itemId } = req.params;
   const ownerId = req.user._id;
   clothingItem
@@ -99,13 +87,10 @@ module.exports.dislikeClothingItem = (req, res) => {
     })
     .then((item) => res.send({ data: item }))
     .catch((err) => {
-      console.error("Error Name = %s Message=%s", err.name, err.message);
-      if (err instanceof Errors.HTTPNotFound) {
-        return Errors.notFoundError(res, err);
-      }
       if (err.name === "CastError") {
-        return Errors.invalidIdError(res, "Item", itemId);
+        next(new HTTPBadRequest(`Invalid Item Id: ${itemId}.`));
+      } else {
+        next(err);
       }
-      return Errors.defaultError(res);
     });
 };
