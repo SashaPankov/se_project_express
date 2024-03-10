@@ -22,7 +22,7 @@ module.exports.getUserById = (req, res, next) => {
 
 module.exports.createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
-  console.log(req.body);
+
   bcrypt
     .hash(password, 10)
     .then((hash) =>
@@ -51,7 +51,6 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  console.log(req.body);
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -71,7 +70,6 @@ module.exports.login = (req, res, next) => {
 
 module.exports.updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
-  console.log(req.user._id);
 
   User.findOneAndUpdate(
     { id: req.user._id },
