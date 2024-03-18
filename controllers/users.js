@@ -4,6 +4,7 @@ const User = require("../models/user");
 const Errors = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 const HTTPConflictError = require("../utils/httpconflicterror");
+const HTTPBadRequest = require("../utils/httpbadrequest");
 
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.user._id)
