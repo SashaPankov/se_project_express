@@ -65,7 +65,7 @@ module.exports.likeClothingItem = (req, res, next) => {
   clothingItem
     .findByIdAndUpdate(itemId, { $addToSet: { likes: ownerId } }, { new: true })
     .orFail(() => {
-      throw new Errors.HTTPNotFound(`Item with id ${itemId} not found`);
+      throw new HTTPNotFound(`Item with id ${itemId} not found`);
     })
     .then((item) => res.send({ data: item }))
     .catch((err) => {
@@ -83,7 +83,7 @@ module.exports.dislikeClothingItem = (req, res, next) => {
   clothingItem
     .findByIdAndUpdate(itemId, { $pull: { likes: ownerId } }, { new: true })
     .orFail(() => {
-      throw new Errors.HTTPNotFound(`Item with id ${itemId} not found`);
+      throw new HTTPNotFound(`Item with id ${itemId} not found`);
     })
     .then((item) => res.send({ data: item }))
     .catch((err) => {
