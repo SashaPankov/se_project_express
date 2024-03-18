@@ -7,8 +7,6 @@ const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 require("dotenv").config();
 
-// console.log(process.env);
-
 const { PORT = 3001 } = process.env;
 const app = express();
 
@@ -28,6 +26,11 @@ app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use(requestLogger);
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
 app.use(routes);
 
 process.on("uncaughtException", (err, origin) => {
