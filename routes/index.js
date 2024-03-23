@@ -7,16 +7,15 @@ const {
   validateUserLogin,
   validateUserInfoBody,
 } = require("../middlewares/validation");
+const HTTPNotFound = require("../utils/httpnotfound");
 
 router.use("/items", clothingItem);
 router.use("/users", user);
 router.use("/signin", validateUserLogin, login);
 router.use("/signup", validateUserInfoBody, createUser);
 
-router.use((req, res) => {
-  res
-    .status(Errors.HTTP_NOT_FOUND)
-    .send({ message: "Requested resource not found" });
+router.use(() => {
+  throw new HTTPNotFound("Requested resource not found");
 });
 
 module.exports = router;
