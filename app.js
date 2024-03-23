@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 require("dotenv").config();
+const { reqLimiter } = require("./middlewares/limiter");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -43,6 +44,8 @@ app.use(errorLogger);
 
 app.use(errors());
 app.use(errorHandler);
+
+app.use(reqLimiter);
 
 app.listen(PORT, () => {
   console.log(`App listening at port ${PORT}`);
