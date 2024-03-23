@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const clothingItem = require("./clothingItems");
 const user = require("./users");
-const Errors = require("../utils/errors");
 const { createUser, login } = require("../controllers/users");
 const {
   validateUserLogin,
