@@ -60,8 +60,8 @@ module.exports.validateItemId = celebrate({
 
 module.exports.validateUserUpdate = celebrate({
   body: Joi.object().keys({
-    _id: Joi.string().required().length(24).hex(),
-    __v: Joi.number(),
+    // _id: Joi.string().required().length(24).hex(),
+    // __v: Joi.number(),
 
     name: Joi.string().required().min(2).max(30).messages({
       "string.min": 'The minimum length of the "name" field is 2',
@@ -74,6 +74,6 @@ module.exports.validateUserUpdate = celebrate({
       "string.uri": 'the "avatar" field must be a valid url',
     }),
 
-    email: Joi.string().required().email(),
+    // email: Joi.string().required().email(),
   }),
 });
